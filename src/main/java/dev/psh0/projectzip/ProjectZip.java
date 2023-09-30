@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ProjectZip {
 
@@ -140,18 +142,18 @@ public class ProjectZip {
         }
     }
 
-    static public <T, W> void storeJSONArray(String jsonFileName, ArrayList<T> list, ProjectZipLambda<T, W> func) throws IOException {
+    static public <T, W> void storeJSONArray(String jsonFileName, ArrayList<T> list, Function<T, W> func) throws IOException {
         // template function to store the JSON array
         JSONArray array = new JSONArray();
-        for(T x : list) array.put(func.run(x));
+        for(T x : list) array.put(func.apply(x));
         ProjectZip.writeString(jsonFileName, array.toString());
     }
 
-    public static <T> void restoreJSONArray(String jsonFileName, Collection<T> list, ProjectZipLambda2<T> func) throws IOException {
+    public static <T> void restoreJSONArray(String jsonFileName, Collection<T> list, Function<JSONObject, T> func) throws IOException {
         // template function to restore the JSON array
         JSONArray array = ProjectZip.readJSONArray(jsonFileName);
         list.clear();
-        for(int c1 = 0; c1 < array.length(); c1++) list.add(func.run(array.getJSONObject(c1)));
+        for(int c1 = 0; c1 < array.length(); c1++) list.add(func.apply(array.getJSONObject(c1)));
     }
 
     public static void storeJSONObject(int id, String jsonFileName, Object obj) throws IOException {
